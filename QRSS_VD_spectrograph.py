@@ -12,6 +12,7 @@ I code when I'm bored, and often I'm bored when I code, so this is a total mess.
 If it works, it works, right?
 """
 
+version = 1.05
 
 
 import JpegImagePlugin
@@ -121,9 +122,11 @@ config={
 	"bandlow":500,		#!	^^^ low in Hz
 	"bandhigh":900,		#!  ^^^ high in Hz
 	"offset":10140000,	#!  Displayed Hz = Hz + offset
+	"smoothing":0,		#! if enabled it uses time-domain averaging
+	"soundcard":0,		#! soundcard ID (usually low integers)
 	
 	# THESE ARE AUTOMATICALLY UPDATED ########
-	"version":1.04, 	# version, obviously
+	"version":version, 	# version, obviously
 	"bufSize":None, 	# number of audio samples per calculation
 						#    changes speed and resolution
 	"fftxs":None,		# frequency units
@@ -141,7 +144,8 @@ config={
 	"ihigh":None,		# fftx[i] of upper limit
 	"lowFreq":None,
 	"highFreq":None,
-	"fldr":"./output/"
+	"fldr":"./output/",
+	"absmax":None		# absolute maximum bandpass frequency
 	
 	
 	
@@ -223,6 +227,7 @@ def recalculateEverything():
 	else:
 		config["fftxs"]=scipy.fftpack.fftfreq(config["bufSize"]*2, 1.0/(config["sampleRate"]))
 		config["fftxs"]=config["fftxs"][:len(config["fftxs"])/2]
+	config["absmax"]=config["fftxs"][-1]
 	config["ilow"]=0
 	config["ihigh"]=len(config["fftxs"]-1)
 	if config["bandpass"]==True:
@@ -281,16 +286,24 @@ def config_load(fname="qrss_vd.cfg"):
 	f.close()
 	try:
 		ctest=eval(raw)
+		if not ctest["version"]==config["version"]:
+			msg="You are running QRSS VD version "+config["version"]+"\n"
+			msg+="Your default config file is for version "+config["version"]+"\n\n"
+			msg+="If load it, right-click and select 'set as default' immediately after!\n"
+			msg+="Do you want to load it anyway? "
+			if tkMessageBox.askokcancel("Load old config?", msg)==False: return
 		gui_shutdown()
 		for key in ctest.keys():
 			config[key]=ctest[key]
 		recalculateEverything()
 	except:
+		#tkMessageBox.showinfo("RESET","The program needs to be restarted to restore factory defaults")
 		config_save()
 	return
 
 def config_save(fname="qrss_vd.cfg"):
 	"""save config settings to file."""
+	#print "SAVING"
 	fname=config["fldr"]+fname
 	msg="saving config file (%d values) to %s"%(len(config),fname)
 	log(msg)
@@ -348,11 +361,33 @@ def config_set(key,value):
 		gui_shutdown()
 		config[key]=value
 		#recorder_startup()
+	elif key == "soundcard":
+		recorder_shutdown()
+		config[key]=value
+		recorder_startup()
+		
 	else:
 		config[key]=value
 	recalculateEverything()
 	return
 
+def getSoundCards():
+	p = pyaudio.PyAudio() 
+	msg="These are the sound cards I found:\n\n"
+	cards=[]
+	for i in range(p.get_default_host_api_info()["deviceCount"]):
+		if p.get_device_info_by_index(i)["maxInputChannels"]>0:
+			cardName = p.get_device_info_by_index(i)["name"]
+			cardIndex = p.get_device_info_by_index(i)["index"]
+			cards.append(cardIndex)
+			msg+="[%d] %s\n"%(cardIndex,cardName)
+	p.terminate()
+	msg+="\nEnter the number of the card to use:"
+	ans=tkSimpleDialog.askinteger("Select Sound Card", msg, initialvalue=cards[0])
+	if not ans==None: 
+		config_set("soundcard",ans)
+	return #ans
+	
 def record(returnPcm=False):
 	"""continuously record from the sound card."""
 	"""This should be run as a thread, and it will continuously
@@ -363,10 +398,12 @@ def record(returnPcm=False):
 	the harder it is to catch up."""
 	global config
 	global chunks
+	print "USING SOUNDCARD:",config["soundcard"]
 	p = pyaudio.PyAudio() 
 	qual=pyaudio.paInt16 #this matches the fromstring() below, increase if ur crazy
 	inStream = p.open(format=qual,channels=1,rate=config["sampleRate"],\
-						input=True,frames_per_buffer=config["bufSize"])
+						input=True,frames_per_buffer=config["bufSize"],\
+						input_device_index=config["soundcard"])
 	while config["dieNOW"]==False:
 		while config["pause"]==True:
 			if config["dieNOW"]==True:
@@ -500,6 +537,7 @@ def triangleShape(list):
 
 mFFT=scipy.array([])
 def memoryFFT(fft,times=5):
+	if times==0: return fft
 	global mFFT
 	if len(mFFT)==0 or len(mFFT[0])<>len(fft):
 		mFFT=scipy.array([fft]) #start a new memory array
@@ -521,7 +559,7 @@ def normalize(ffty): #COULD USE TECHNIQUE WORK TO IMPROVE WEAKSIGNALS!!!!
 	global before_min,before_max,before_average	
 	#print "max ffty before:",ffty.max()
 	#if True:
-	#	ffty=memoryFFT(ffty,5)
+	ffty=memoryFFT(ffty,config["smoothing"])
 	#print "max ffty after:",ffty.max()
 	#ffty=detrend(ffty)
 	#ffty=smooth(ffty)
@@ -763,8 +801,9 @@ def cornerLogo(width,height):
 	#im.save("scale_corner.bmp","BMP")
 	return im
 	
-def genLogo(scaleby=15,rotate=50):
+def genLogo(scaleby=15,rotate=40):
 	"""create QRSS VD text as an image."""
+	if rotate>0: rotate+=random.randint(0,50)
 	b="1111011110111101111000100101110210010100101000010000001001010012"
 	b+="1001011110111101111000100101001210110101000001000010001010010012"
 	b+="1111010110111101111000010001110"
@@ -819,6 +858,17 @@ def delete_file(fname="qrss_vd.cfg"):
 		"I've been told to delete:\n%s\n\nIs this what you want to do?"%fname):
 		os.remove(config["fldr"]+fname)
 		tkMessageBox.showinfo("PLEASE CLOSE PROGRAM","The program needs to be restarted to restore factory defaults")
+
+def launchFldr1():
+	fldr=os.getcwd()
+	#os.system('explorer '+fldr)
+	os.startfile(fldr)
+	
+def launchFldr2():
+	fldr=os.getcwd()+config["fldr"]#.replace('.','').replace('/','\\')
+	#os.system('explorer '+fldr)
+	os.startfile(fldr)
+
 		
 def colorize(im):
 	"""go from 8-bit grayscale to colormapped RGB image."""
@@ -841,7 +891,9 @@ def credits():
 	master.config(padx=5, pady=5)
 	author = LabelFrame(master, text="Author", padx=5, pady=5)
 	author.grid(row=1,column=1,sticky=E+W)
-	msg="""QRSS VD was written by
+	msg="QRSS VD version "+str(version)
+	msg+="""
+QRSS VD was written by
 Scott Harden, AJ4VD
 wesite: www.SWHarden.com
 email: SWHarden@gmail.com"""
@@ -864,7 +916,7 @@ Fred Eckert
 
 HARDWARE:
 Dr. Jay Garlitz
-University of FL ARC"""
+University of FL Amateur Radio Club"""
 	Label(thanks,text=msg, wraplength=150,justify=LEFT).grid(row=1,column=1)
 	mainloop()
 
@@ -913,15 +965,7 @@ def genSplash(width,height):
 class frame_spectrograph(Frame):
 	"""the GUI = scary, messy code."""
 	
-	loading = Tk()
-	loading.title("QRSS VD IS LOADING!!!")
-	loading.config(padx=5, pady=5)
-	Label(loading,text="Please be patient while QRSS VD warms up...").grid(row=1,column=1,sticky=E+W+N+S)
 
-	def doneLoading(self):
-		if self.loading==None:
-			self.loading.destroy()
-			self.loading=None
 	
 	
 	global config,openwindows
@@ -1053,7 +1097,10 @@ class frame_spectrograph(Frame):
 			config_set("power",int(ePower.get()))
 			config_set("width",int(eWid.get()))
 			config_set("bandlow",int(elow.get()))
-			config_set("bandhigh",int(ehigh.get()))
+			bandhigh=int(ehigh.get())
+			if bandhigh>config["absmax"]:
+				bandhigh=config["absmax"]
+			config_set("bandhigh",bandhigh)
 			
 			
 		Button(fRates,text="APPLY VALUES",command=applyCalcs).grid(row=4,column=1,columnspan=2)
@@ -1115,7 +1162,7 @@ class frame_spectrograph(Frame):
 		fFft=Frame(wLog,padx=5,pady=5,bd=2,relief=GROOVE)
 		fFft.grid(row=7,column=1, sticky=N+S+E+W)
 		
-		Label(fFft,text="Transofmation: ",justify=RIGHT).grid(row=1,column=1,sticky=E+W)
+		Label(fFft,text="Transformation: ",justify=RIGHT).grid(row=1,column=1,sticky=E+W)
 		transType= StringVar(fFft)
 		if config["RFT"]==True: transType.set("Real FFT")
 		else: transType.set("Fast Fourier (best)")
@@ -1124,6 +1171,11 @@ class frame_spectrograph(Frame):
 			if transType.get() =="Real FFT": config_set("RFT",True)
 			elif transType.get() =="Fast Fourier (best)": config_set("RFT",False)
 		Button(fFft,text="SET",command=set_transtype).grid(row=1,column=3)
+		Label(fFft,text="Time-domain smoothing: ",justify=RIGHT).grid(row=2,column=1,sticky=E+W)
+		eSmth=Entry(fFft)
+		eSmth.grid(row=2,column=2,sticky=E+W)
+		eSmth.insert(0,str(config_get("smoothing")))
+		Button(fFft,text="SET",command=lambda:config_set("smoothing",int(eSmth.get()))).grid(row=2,column=3)
 		
 	def window_offset(self,event=None):
                 offset=tkSimpleDialog.askstring("OFFSET","""
@@ -1150,18 +1202,20 @@ I, Scott Harden (AJ4VD) fully intend for there to be some quirks with this progr
 some of which may induce a full crash (where the program disappears completely), but
 I'm confident that I can fix ALL issues, and correct ALL crashing problems in future
 releaces if I have enough information about the problem.
-
+||
 If you found something that makes QRSS VD crash, please be a good pal and let me know
-about it!  My email address is SWHarden@Gmail.com, and I would greatly appreciate it
-if you could send me a description of the crash along with the crash log file.
-
+about it! Post a message on the QRSS VD Google Group along with a description of
+the crash and the last several lines of the crash log file.
+||
 Crash log files end in ".exe.log" and are in the same folder as the program that crashed.
-
+||
 PS: I know sometimes QRSS VD crashes when it exists.  I'm not worried about it.  I'm
 just a clumsy programmer.  Think of exiting as a controlled crash.
 
-			Thanks and 73! --Scott, AJ4VD"""
+			Thanks and 73! --Scott, AJ4VD""".replace('\n','').replace('|','\n')
 		tkMessageBox.showinfo("WHAT TO DO WHEN QRSS VD ACTS UP",msg)
+		site="http://groups.google.com/group/qrss-vd"
+		webbrowser.open(site)
 		
 	def window_autosave(self,event=None):
 		"""window for autosave options."""
@@ -1272,6 +1326,7 @@ just a clumsy programmer.  Think of exiting as a controlled crash.
 		else: state=""
 		#self.master.title("LOADING!!!")
 		#self.master.geometry("300x100")
+		self.master.title("LOADING...")
 		self.master.update()
 		#loading=Label(self.master,text="LOADING...")
 		#loading.grid(row=1,column=1)
@@ -1282,22 +1337,23 @@ just a clumsy programmer.  Think of exiting as a controlled crash.
 			site="http://www.SWHarden.com/QRSS_VD/"
 			webbrowser.open(site)
 		def hitSiteDocs(event=None):
-			site="http://www.SWHarden.com/QRSS_VD/"
+			site="http://www.swharden.com/QRSS_VD/#documentation"
 			webbrowser.open(site)
 		def hitSiteSource(event=None):
-			site="http://www.SWHarden.com/QRSS_VD/"
+			site="http://www.swharden.com/QRSS_VD/#download"
 			webbrowser.open(site)
 		def hitSiteScott(event=None):
 			site="http://www.swharden.com/blog/?page_id=344"
 			webbrowser.open(site)
 		def hitSiteSuggest(event=None):
-			site="http://www.swharden.com/blog/?page_id=339"
 			msg="So you have an idea to make QRSS VD better?  Awesome!  Chances are "
 			msg+="someone else wants the same feature you do.  Tell me about it and "
 			msg+="I'll try to include your idea in the next version of QRSS VD! \n\n"
-			msg+="EMAIL: "+"swharden"+"@"+"gmail"+"."+"c"+"om"
+			#msg+="EMAIL: "+"swharden"+"@"+"gmail"+"."+"c"+"om"
 			tkMessageBox.showinfo("SUGGEST A FEATURE",msg)
-			webbrowser.open(site)
+			#webbrowser.open("http://www.swharden.com/QRSS_VD/#gg")
+			webbrowser.open("http://groups.google.com/group/qrss-vd")
+
 		
 		def doPause(event=None):
 			self.master.title("QRSS VD - Spectrograph Monitor [PAUSED]")
@@ -1306,19 +1362,25 @@ just a clumsy programmer.  Think of exiting as a controlled crash.
 			self.master.title("QRSS VD - Spectrograph Monitor")
 			recorder_resume()
 		
-		# RIGHT CLICK MENU#####################
+		
 		def do_rightClickMenu(event):
 			try:popup.tk_popup(event.x_root, event.y_root, 0)
 			finally:popup.grab_release()
 		def capnw():
 			captureNow(im)
+			
+
+		
+		# RIGHT CLICK MENU#####################
 		popup = Menu(self.canv, tearoff=0)
 		popup.add_command(label="Return")
+		popup.add_command(label="Launch Viewer",command=lambda:os.startfile("QRSS_VD_viewer.exe"))
 		popup.add_separator()
 		popup.add_command(label="  ||  Pause",command=doPause)
 		popup.add_command(label=" >> Resume",command=doResume)
 		popup.add_command(label="  ()  Capture Now",command=capnw)
 		popup.add_separator()
+		popup.add_command(label="Set Sound Card",command=getSoundCards)
 		popup.add_command(label="General Settings",command=self.window_settings)
 		popup.add_command(label="Autosave Options",command=self.window_autosave)
 		popup.add_command(label="Set Base Frequency",command=self.window_offset)		
@@ -1330,12 +1392,16 @@ just a clumsy programmer.  Think of exiting as a controlled crash.
 		popup.add_command(label="Program Statistics",command=self.window_stats)
 		popup.add_command(label="Developer Console",command=self.window_console)
 		popup.add_separator()
+		popup.add_command(label="Open Program Folder",command=launchFldr1)
+		popup.add_command(label="Open Output Folder",command=launchFldr2)
+		popup.add_separator()
+		popup.add_command(label="QRSS VD Google Group",command=lambda: webbrowser.open("http://groups.google.com/group/qrss-vd"))
 		popup.add_command(label="Does QRSS VD crash?!",command=self.crashDoWhat)
+		popup.add_command(label="Suggest a Feature",command=hitSiteSuggest)
 		popup.add_separator()
 		popup.add_command(label="QRSS VD Website",command=hitSite)
 		popup.add_command(label="QRSS VD Documentation",command=hitSiteDocs)
 		popup.add_command(label="QRSS VD Source Code",command=hitSiteSource)
-		popup.add_command(label="Suggest a Feature",command=hitSiteSuggest)
 		popup.add_command(label="About AJ4VD",command=hitSiteScott)
 		popup.add_command(label="Credits",command=credits)
 		self.canv.bind("<Button-3>", do_rightClickMenu)
@@ -1401,7 +1467,7 @@ just a clumsy programmer.  Think of exiting as a controlled crash.
 		# THIS THREAD WILL KEEP THE AUDIO RECORDER CONTINUOUSLY RUNNING
 		#raw_input("PAUSED")
 		recorder_startup()
-		self.doneLoading()
+		#self.doneLoading()
 		def updateOrDie():
 			if config["dieNOW"]==True: 
 				#self.master.destroy()

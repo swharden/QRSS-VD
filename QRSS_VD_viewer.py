@@ -1,9 +1,11 @@
+version = "1.05"
+
 
 # from Tkinter import *
 # import os
 # import time
 import tkFileDialog
-
+import tkSimpleDialog
 # import tkMessageBox
 # import ImageTk, Tkinter
 # import datetime
@@ -231,7 +233,7 @@ def addScales(im,yoffset=0,xleft=None,message="",startTime=0):
 class ScrolledCanvas(Frame):
 	def __init__(self, parent=None):
 		Frame.__init__(self, parent)
-		self.master.title("QRSS VD - Spectrogram Viewer")
+		self.master.title("QRSS VD - Spectrogram Viewer v"+version)
 		self.pack(expand=YES, fill=BOTH)
 		self.canv = Canvas(self, relief=SUNKEN)
 		self.canv.config(width=700, height=500)
@@ -365,6 +367,8 @@ class ScrolledCanvas(Frame):
 		popup.add_command(label="save ENTIRE image",command=saveWhole)
 		popup.add_separator()
 		popup.add_command(label="QRSS VD Website",command=hitSite)
+		popup.add_command(label="QRSS VD User Group",command=lambda: webbrowser.open("http://groups.google.com/group/qrss-vd"))
+		
 		self.canv.bind("<Button-3>", do_rightClickMenu)
 		self.canv.bind("<1>", click)
 		self.master.update()
@@ -444,10 +448,11 @@ def populateImageList(arg=None):
 		if files[i][-4:] in [".bmp",".png",".jpg"] and "_" in files[i]:
 			fsec=int(files[i].split("_")[1].split(".")[0])
 			imageFiles.append([files[i],fsec])
-			if len(imageFiles)>0:
-				if not imageFiles[i-1][1]==None:
-					if imageFiles[i][1]>imageFiles[i-1][1]+60*20: #NUMBER OF SECONDS TO CONSIDER A SPACE
-						imageFiles.insert(len(imageFiles)-1,[" -- space -- ",None])
+			#if len(imageFiles)>1:
+			#SPACE FOR TEST
+			#	if not imageFiles[i-1][1]==None:
+			#		if imageFiles[i][1]>imageFiles[i-1][1]+60*20: #NUMBER OF SECONDS TO CONSIDER A SPACE
+			#			imageFiles.insert(len(imageFiles)-1,[" -- space -- ",None])
 			#print files[i],fsec
 	listbox.delete(0,END)
 	
@@ -485,7 +490,7 @@ def textIntro():
 	daText=daText.replace("8","9")			
 	daText=daText.replace("9"," ")			
 	print "\n"*20+daText+"by Scott Harden, AJ4VD"," "*19,
-	print str("viewer 1.04")
+	print str("viewer "+version)
 	print "\n"*5
 	time.sleep(1)
 
