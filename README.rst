@@ -33,7 +33,7 @@ Morse code Q-code for "slow down" is QRS, and QRSS implies incredibly slow
 transmission of information), low power transmitters (perhaps running only a few
 milliwatts) can be detected thousands of miles away!
 
-.. image:: img/sample_capture.png
+.. image:: https://github.com/QRSS-VD/QRSS-VD/raw/master/img/sample_capture.png
 
 *This is an image created by QRSS VD.* On the vertical axis we have frequency
 (with respect to my radio's frequency at the time, 10.140mHz), and on the
@@ -48,7 +48,7 @@ and down by ~10Hz are KC7VHS and WA5DJJ in NM, USA running ~250 milliwatts.
 These signals are interpreted by Morse code, and take a long time to come across
 (about 1 letter per minute). Here's an example:
 
-.. image:: img/qrss_kj4ldf.png
+.. image:: https://github.com/QRSS-VD/QRSS-VD/raw/master/img/qrss_kj4ldf.png
 
 However, the image above is only a small, teeny, tiny part of the radio
 spectrum. It goes on far in all directions (along both the frequency and time
@@ -58,7 +58,7 @@ The blue square represents the region where the green image above (with the
 flying W) was taken. The quality of this image was greatly reduced to make it
 web-friendly. It's over 8,000 pixels wide and over 1,000 pixels high!
 
-.. image:: img/huge_blue_square.jpg
+.. image:: https://github.com/QRSS-VD/QRSS-VD/raw/master/img/huge_blue_square.jpg
    :width: 500
 
 Note that as large as that image is, it could have been much larger. QRSS VD has
@@ -69,7 +69,7 @@ of QRSS VD is that it lets you make these decisions later, without having to
 destroy any data. While QRSS VD is recording you can scroll up, down, left,
 and right without messing-up any of the images.
 
-.. image:: img/got_it.jpg
+.. image:: https://github.com/QRSS-VD/QRSS-VD/raw/master/img/got_it.jpg
    :height: 500
 
 How does it to everything? It listens to you!  You tell it how much audio to
@@ -80,7 +80,7 @@ adjustments, etc. (don't worry, they're all preset for common QRSS use!). While
 you analyze, you can adjust most of these settings in real time. The GUI is seen
 on the right.
 
-.. image:: img/small_slices.png
+.. image:: https://github.com/QRSS-VD/QRSS-VD/raw/master/img/small_slices.png
 
 While it runs, QRSS VD generates and saves spectrograms in ~10 minute chunks.
 Note that you can make it save each chunk as the same filename (good for a web
@@ -90,18 +90,18 @@ BMP files! (pictured on the left) QRSS VD viewer can then open a folder filled
 with these BMP files, assemble them as a giant map, and let you scroll around in
 all directions (somewhat like Google maps!, pictured below).
 
-.. image:: img/qrssvd_viewer.png
+.. image:: https://github.com/QRSS-VD/QRSS-VD/raw/master/img/qrssvd_viewer.png
 
 If you see a cool region you want to extract, Just click on the top left side of
 the region, then the bottom right side. The QRSS VD Viewer automatically makes a
 new, cropped image, adds scale bars, and opens it for you to save! How
 convenient is that?
 
-.. image:: img/qrss_saved.png
+.. image:: https://github.com/QRSS-VD/QRSS-VD/raw/master/img/qrss_saved.png
 
 Selecting larger regions creates bigger images, such as:
 
-.. image:: img/ts_830s.png
+.. image:: https://github.com/QRSS-VD/QRSS-VD/raw/master/img/ts_830s.png
    :width: 500
 
 Here we've captured several QRSS signals. From top to bottom:
