@@ -105,9 +105,9 @@ Selecting larger regions creates bigger images, such as:
    :width: 500
 
 Here we've captured several QRSS signals. From top to bottom:
-IQ4DJ (straight CW)
-G6AVK (Triangles, up is a dot down is a dash)
-G3ZJO (mountains)
-AA5CK (3 Hz frequency shift)
-??? (10 Hz frequency shift, too weak to copy)
-WA5DJJ(10 Hz frequency shift)
+ - IQ4DJ (straight CW)
+ - G6AVK (Triangles, up is a dot down is a dash)
+ - G3ZJO (mountains)
+ - AA5CK (3 Hz frequency shift)
+ - ??? (10 Hz frequency shift, too weak to copy)
+ - WA5DJJ (10 Hz frequency shift)
