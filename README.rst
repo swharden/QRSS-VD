@@ -5,6 +5,9 @@ QRSS VD was last tested on 2016-07-30 and confirmed to run on a stock WinPython 
 
 .. image:: https://github.com/QRSS-VD/QRSS-VD/raw/master/img/2016-07-30-screenshot.jpg
 
+I just added sources for QRSS stacker and QRSS stitcher. Details of that software can be found here:
+http://www.swharden.com/wp/vd-labs-software-by-aj4vd/
+
 What is QRSS VD?
 ----------------
 
