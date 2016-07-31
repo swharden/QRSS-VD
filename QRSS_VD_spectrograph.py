@@ -1,19 +1,12 @@
 #!/usr/bin/env python
-# QRSS_VD.py
- 
-"""QRSS VD - high resolution spectrum analyzer by Scott Harden, AJ4VD."""
-
 """
+QRSS VD - high resolution spectrum analyzer by Scott Harden, AJ4VD.
+
    Written by: Scott Harden, AJ4VD (SWHarden@gmail.com)
       Website: http://www.SWHarden.com
-
-Note: I'm not a programmer.  I'm a molecular biologist, and a dental student.
-I code when I'm bored, and often I'm bored when I code, so this is a total mess.
-If it works, it works, right?
 """
 
 version = 1.05
-
 
 from PIL import JpegImagePlugin
 from PIL import TgaImagePlugin
