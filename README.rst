@@ -1,4 +1,5 @@
-# Last Tested
+Last Tested: 2016
+----------------
 
 QRSS VD was last tested on 2016-07-30 and confirmed to run on a [stock WinPython 2.7.10.3] (http://winpython.sourceforge.net/) distribution. Note that a slight modification to the code was required to fix some python imaging library imports and that it may have affected saving of images in differnent formats (so pay attention to error codes on saving).
 
