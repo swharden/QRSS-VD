@@ -8,40 +8,6 @@ QRSS VD - high resolution spectrum analyzer by Scott Harden, AJ4VD.
 
 version = 1.05
 
-from PIL import JpegImagePlugin
-from PIL import TgaImagePlugin
-from PIL import PngImagePlugin
-from PIL import GifImagePlugin
-from PIL import PcxImagePlugin
-from PIL import PpmImagePlugin
-from PIL import BmpImagePlugin
-from PIL import FliImagePlugin
-from PIL import EpsImagePlugin
-from PIL import DcxImagePlugin
-from PIL import FpxImagePlugin
-from PIL import ArgImagePlugin
-from PIL import CurImagePlugin
-from PIL import GbrImagePlugin
-from PIL import IcoImagePlugin
-from PIL import ImImagePlugin
-from PIL import ImtImagePlugin
-from PIL import IptcImagePlugin
-from PIL import McIdasImagePlugin
-from PIL import MicImagePlugin
-from PIL import MspImagePlugin
-from PIL import PcdImagePlugin
-from PIL import PdfImagePlugin
-from PIL import PixarImagePlugin
-from PIL import PsdImagePlugin
-from PIL import SgiImagePlugin
-from PIL import SunImagePlugin
-from PIL import TgaImagePlugin
-from PIL import TiffImagePlugin
-from PIL import WmfImagePlugin
-from PIL import XVThumbImagePlugin
-from PIL import XbmImagePlugin
-from PIL import XpmImagePlugin
-
 import os
 import pyaudio
 import scipy
