@@ -1,7 +1,7 @@
 Last Tested: 2016
 ----------------
 
-QRSS VD was last tested on 2016-07-30 and confirmed to run on a stock WinPython 2.7.10.3 (http://winpython.sourceforge.net/) distribution. Note that a slight modification to the code has been made recently relating to python imaging library imports and that it may have affected saving of images in differnent formats (so pay attention to error codes on saving). Here's the screenshot on a Windows 10 system:
+QRSS VD was last tested on 2016-07-30 and confirmed to run on a stock WinPython 2.7.10.3 (http://winpython.sourceforge.net/) distribution. Note that a slight modification to the code has been made recently relating to python imaging library imports and that it may have affected saving of images in differnent formats (so pay attention to error codes on saving). This program is entirely contained within the spectrograph.py file. Here's the screenshot of it running on Windows 10:
 
 .. image:: https://github.com/QRSS-VD/QRSS-VD/raw/master/img/2016-07-30-screenshot.jpg
 
