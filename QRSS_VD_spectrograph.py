@@ -15,39 +15,39 @@ If it works, it works, right?
 version = 1.05
 
 
-import JpegImagePlugin
-import TgaImagePlugin
-import PngImagePlugin
-import GifImagePlugin
-import PcxImagePlugin
-import PpmImagePlugin
-import BmpImagePlugin
-import FliImagePlugin
-import EpsImagePlugin
-import DcxImagePlugin
-import FpxImagePlugin
-import ArgImagePlugin
-import CurImagePlugin
-import GbrImagePlugin
-import IcoImagePlugin
-import ImImagePlugin
-import ImtImagePlugin
-import IptcImagePlugin
-import McIdasImagePlugin
-import MicImagePlugin
-import MspImagePlugin
-import PcdImagePlugin
-import PdfImagePlugin
-import PixarImagePlugin
-import PsdImagePlugin
-import SgiImagePlugin
-import SunImagePlugin
-import TgaImagePlugin
-import TiffImagePlugin
-import WmfImagePlugin
-import XVThumbImagePlugin
-import XbmImagePlugin
-import XpmImagePlugin
+from PIL import JpegImagePlugin
+from PIL import TgaImagePlugin
+from PIL import PngImagePlugin
+from PIL import GifImagePlugin
+from PIL import PcxImagePlugin
+from PIL import PpmImagePlugin
+from PIL import BmpImagePlugin
+from PIL import FliImagePlugin
+from PIL import EpsImagePlugin
+from PIL import DcxImagePlugin
+from PIL import FpxImagePlugin
+from PIL import ArgImagePlugin
+from PIL import CurImagePlugin
+from PIL import GbrImagePlugin
+from PIL import IcoImagePlugin
+from PIL import ImImagePlugin
+from PIL import ImtImagePlugin
+from PIL import IptcImagePlugin
+from PIL import McIdasImagePlugin
+from PIL import MicImagePlugin
+from PIL import MspImagePlugin
+from PIL import PcdImagePlugin
+from PIL import PdfImagePlugin
+from PIL import PixarImagePlugin
+from PIL import PsdImagePlugin
+from PIL import SgiImagePlugin
+from PIL import SunImagePlugin
+from PIL import TgaImagePlugin
+from PIL import TiffImagePlugin
+from PIL import WmfImagePlugin
+from PIL import XVThumbImagePlugin
+from PIL import XbmImagePlugin
+from PIL import XpmImagePlugin
 
 import os
 import pyaudio
@@ -60,7 +60,7 @@ import threading
 import time, datetime
 import math
 #import Image
-import ImageTk
+from PIL import ImageTk
 from PIL import Image
 from PIL import ImageOps
 from PIL import ImageChops
